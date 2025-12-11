@@ -14,6 +14,12 @@ import matplotlib.pyplot as plt
 from isochrone_selection import select_stars, select_stars_color_range
 
 
+# Constants for synthetic data generation
+COLOR_SCATTER_STD = 0.05  # Standard deviation of color scatter around isochrone
+MAG_SCATTER_STD = 0.15    # Standard deviation of magnitude scatter around isochrone
+MAG_RANGE_EXTENSION = 2.0  # Magnitude range extension for field stars
+
+
 def generate_synthetic_isochrone():
     """Generate a synthetic isochrone curve."""
     # Create a realistic-looking isochrone curve (e.g., main sequence + red giant branch)
@@ -65,15 +71,15 @@ def generate_synthetic_stars(isochrone_color, isochrone_mag, n_cluster=500, n_fi
     cluster_mag_base = isochrone_mag[indices]
     
     # Add scatter around the isochrone
-    color_scatter = np.random.normal(0, 0.05, n_cluster)
-    mag_scatter = np.random.normal(0, 0.15, n_cluster)
+    color_scatter = np.random.normal(0, COLOR_SCATTER_STD, n_cluster)
+    mag_scatter = np.random.normal(0, MAG_SCATTER_STD, n_cluster)
     
     cluster_color = cluster_color_base + color_scatter
     cluster_mag = cluster_mag_base + mag_scatter
     
     # Generate field stars uniformly distributed
     color_min, color_max = isochrone_color.min() - 0.5, isochrone_color.max() + 0.5
-    mag_min, mag_max = float(isochrone_mag.min() - 2), float(isochrone_mag.max() + 2)
+    mag_min, mag_max = float(isochrone_mag.min() - MAG_RANGE_EXTENSION), float(isochrone_mag.max() + MAG_RANGE_EXTENSION)
     
     # Ensure valid range
     if mag_min > mag_max:
@@ -149,7 +155,7 @@ def main():
     threshold = 0.3
     selected_distance, distances = select_stars(
         star_color, star_mag, iso_color, iso_mag, 
-        threshold=threshold, metric='perpendicular'
+        threshold=threshold
     )
     n_selected = np.sum(selected_distance)
     print(f"   Threshold: {threshold}")

@@ -12,7 +12,10 @@ from scipy.spatial import cKDTree
 
 def perpendicular_distance(points, isochrone_color, isochrone_mag):
     """
-    Calculate the perpendicular distance from points to an isochrone curve.
+    Calculate the distance from points to the nearest point on an isochrone curve.
+    
+    This function computes the Euclidean distance to the nearest point on the 
+    isochrone using a KD-tree for efficient nearest neighbor search.
     
     Parameters
     ----------
@@ -26,7 +29,7 @@ def perpendicular_distance(points, isochrone_color, isochrone_mag):
     Returns
     -------
     distances : ndarray
-        Perpendicular distance of each point to the isochrone
+        Distance of each point to the nearest point on the isochrone
     """
     points = np.asarray(points)
     isochrone_color = np.asarray(isochrone_color)
@@ -47,29 +50,8 @@ def perpendicular_distance(points, isochrone_color, isochrone_mag):
     return distances
 
 
-def euclidean_distance(points, isochrone_color, isochrone_mag):
-    """
-    Calculate the Euclidean distance from points to the nearest point on an isochrone.
-    
-    Parameters
-    ----------
-    points : array-like, shape (n, 2)
-        Array of points with columns [color, magnitude]
-    isochrone_color : array-like
-        Color values of the isochrone
-    isochrone_mag : array-like
-        Magnitude values of the isochrone
-    
-    Returns
-    -------
-    distances : ndarray
-        Euclidean distance of each point to the nearest isochrone point
-    """
-    return perpendicular_distance(points, isochrone_color, isochrone_mag)
-
-
 def select_stars(star_color, star_mag, isochrone_color, isochrone_mag, 
-                 threshold, metric='perpendicular'):
+                 threshold, metric='euclidean'):
     """
     Select stars that lie within a specified distance from an isochrone.
     
@@ -86,7 +68,9 @@ def select_stars(star_color, star_mag, isochrone_color, isochrone_mag,
     threshold : float
         Maximum distance from the isochrone for selection
     metric : str, optional
-        Distance metric to use: 'perpendicular' or 'euclidean' (default: 'perpendicular')
+        Distance metric to use: 'euclidean' (default)
+        Note: Currently only 'euclidean' is supported, which computes
+        the distance to the nearest point on the isochrone.
     
     Returns
     -------
@@ -101,13 +85,11 @@ def select_stars(star_color, star_mag, isochrone_color, isochrone_mag,
     # Create array of star positions
     points = np.column_stack([star_color, star_mag])
     
-    # Calculate distances based on metric
-    if metric == 'perpendicular':
+    # Calculate distances
+    if metric == 'euclidean' or metric == 'perpendicular':
         distances = perpendicular_distance(points, isochrone_color, isochrone_mag)
-    elif metric == 'euclidean':
-        distances = euclidean_distance(points, isochrone_color, isochrone_mag)
     else:
-        raise ValueError(f"Unknown metric: {metric}. Use 'perpendicular' or 'euclidean'.")
+        raise ValueError(f"Unknown metric: {metric}. Use 'euclidean' or 'perpendicular'.")
     
     # Create selection mask
     mask = distances <= threshold

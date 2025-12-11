@@ -52,8 +52,7 @@ star_mag = np.array([10.5, 11.3, 12.1, 15.0])
 selected_mask, distances = select_stars(
     star_color, star_mag,
     iso_color, iso_mag,
-    threshold=0.3,
-    metric='perpendicular'
+    threshold=0.3
 )
 
 print(f"Selected {np.sum(selected_mask)} out of {len(star_color)} stars")
@@ -63,7 +62,7 @@ print(f"Selected {np.sum(selected_mask)} out of {len(star_color)} stars")
 
 ### Method 1: Distance-based Selection
 
-The most flexible method, selecting stars based on their distance to the isochrone:
+The most flexible method, selecting stars based on their distance to the nearest point on the isochrone:
 
 ```python
 from isochrone_selection import select_stars
@@ -72,8 +71,7 @@ from isochrone_selection import select_stars
 mask, distances = select_stars(
     star_color, star_mag,
     isochrone_color, isochrone_mag,
-    threshold=0.2,
-    metric='perpendicular'  # or 'euclidean'
+    threshold=0.2
 )
 
 selected_stars_color = star_color[mask]
@@ -127,7 +125,7 @@ python -m unittest test_isochrone_selection.py -v
 
 ## API Reference
 
-### `select_stars(star_color, star_mag, isochrone_color, isochrone_mag, threshold, metric='perpendicular')`
+### `select_stars(star_color, star_mag, isochrone_color, isochrone_mag, threshold, metric='euclidean')`
 
 Select stars within a specified distance from an isochrone.
 
@@ -137,7 +135,7 @@ Select stars within a specified distance from an isochrone.
 - `isochrone_color` (array-like): Color values of the isochrone
 - `isochrone_mag` (array-like): Magnitude values of the isochrone
 - `threshold` (float): Maximum distance for selection
-- `metric` (str): Distance metric ('perpendicular' or 'euclidean')
+- `metric` (str, optional): Distance metric ('euclidean' or 'perpendicular', default: 'euclidean'). Both compute the distance to the nearest point on the isochrone.
 
 **Returns:**
 - `mask` (ndarray of bool): Selection mask (True = selected)
@@ -159,10 +157,6 @@ Select stars within a rectangular region around the isochrone.
 ### `perpendicular_distance(points, isochrone_color, isochrone_mag)`
 
 Calculate perpendicular distances from points to an isochrone curve.
-
-### `euclidean_distance(points, isochrone_color, isochrone_mag)`
-
-Calculate Euclidean distances to the nearest point on an isochrone.
 
 ## Use Cases
 

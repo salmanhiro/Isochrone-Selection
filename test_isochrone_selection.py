@@ -6,7 +6,6 @@ import unittest
 import numpy as np
 from isochrone_selection import (
     perpendicular_distance,
-    euclidean_distance,
     select_stars,
     select_stars_color_range
 )
@@ -41,10 +40,10 @@ class TestIsochroneSelection(unittest.TestCase):
         self.assertEqual(distances.shape, (len(self.star_color),))
         self.assertTrue(np.all(distances >= 0))
     
-    def test_euclidean_distance(self):
-        """Test Euclidean distance calculation."""
+    def test_distance_calculation(self):
+        """Test distance calculation using perpendicular_distance."""
         points = np.column_stack([self.star_color, self.star_mag])
-        distances = euclidean_distance(points, self.iso_color, self.iso_mag)
+        distances = perpendicular_distance(points, self.iso_color, self.iso_mag)
         
         self.assertEqual(distances.shape, (len(self.star_color),))
         self.assertTrue(np.all(distances >= 0))
